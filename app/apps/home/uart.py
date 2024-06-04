@@ -3,14 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from apps.home import blueprint
-from flask import render_template, request
-from flask_login import login_required
-from jinja2 import TemplateNotFound
-from flask_socketio import SocketIO, emit
-import subprocess
-import threading
-import time
+from flask_socketio import SocketIO
 import os 
 import serial
 from threading import Thread
