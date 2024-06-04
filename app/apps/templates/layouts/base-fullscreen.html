@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        MACOBOX - {% block title %}{% endblock %} | AppSeed
+    </title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Favicon icon -->
+    <link rel="icon" href="{{ config.ASSETS_ROOT }}/images/favicon.ico" type="image/x-icon">
+    <!-- fontawesome icon -->
+    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/fonts/fontawesome/css/fontawesome-all.min.css">
+    <!-- animation css -->
+    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/plugins/animation/css/animate.min.css">
+    <!-- vendor css -->
+    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/css/style.css">
+    <!-- dark mode css -->
+    <link rel="stylesheet" href="{{ config.ASSETS_ROOT }}/css/dark.css">
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+</head>
+<body>
+    
+    {% block content %}{% endblock content %}
+
+    <!-- Enable the dark mode -->
+    <label class="d-none">
+        <i class="icon feather icon-sun" id="theme-indicator"></i>
+        <input type="checkbox" id="theme-switch" class="d-none">
+    </label>
+
+    {% include 'includes/scripts.html' %}
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}{% endblock javascripts %}    
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+rm -rf ./lib &&
+mkdir lib &&
+rollup -c config/rollup.config.mjs &&
+DEBUG_BUILD=true rollup -c config/rollup.config.mjs &&
+babel src --config-file ./config/babel.config.json --out-dir lib --extensions .ts &&
+postcss --config ./config -o jqtree.css css/jqtree.postcss

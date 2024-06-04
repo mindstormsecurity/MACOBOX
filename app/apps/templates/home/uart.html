@@ -1,0 +1,475 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UART {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<script src="{{ config.ASSETS_ROOT }}/plugins/jquery.js"></script>
+
+<script src="{{ config.ASSETS_ROOT }}/js/socket.io.js"></script>
+
+<script type="text/javascript" src="/static/assets/js/spinner/spin.js"></script>
+<link rel="stylesheet" href="/static/assets/js/spinner/spin.css">
+
+<style>
+    #data_container {
+        position: relative;
+        overflow-y: scroll; 
+        max-height: 300px;
+    }
+
+</style>
+
+<div id="foo" class="spinner" ></div>
+
+<!-- [ Main Content ] start -->
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <!-- [ breadcrumb ] start -->
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">UART</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- [ breadcrumb ] end -->
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="alert snackbar-primary" role="alert">
+                            Make sure to press the button below before turning on the DUT
+                        </div>
+                        <!-- [ Main Content ] start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>UART</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="baudrate">Select baudrate</label>
+                                            <select class="form-control" id="baudrate">
+                                                <option>110</option>
+                                                <option>300</option>
+                                                <option>600</option>
+                                                <option>1200</option>
+                                                <option>2400</option>
+                                                <option>4800</option>
+                                                <option>9600</option>
+                                                <option>14400</option>
+                                                <option>19200</option>
+                                                <option>38400</option>
+                                                <option>57600</option>
+                                                <option selected>115200</option>
+                                                <option>128000</option>
+                                                <option>256000</option>
+                                            </select>
+                                        </div>
+                                        <button id="uartButton" class="btn btn-primary mb-2">Start</button>
+
+                                    </div>
+                                    
+                                </div>
+                                <div class="col-md-12">
+                                    <h5 class="mt-4">Saved logs</h5>
+                                    <hr>
+                                    <div id="savedLogs"></div>
+
+                                </div>     
+
+                            </div>
+
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5>Output</h5>
+                                    <div>
+                                        <button id="saveBtn" class="btn btn-sm btn-outline-primary mb-2"><i
+                                                class="feather icon-save"></i></button>
+                                        <button id="analyzeButton"
+                                            class="btn btn-sm btn-outline-primary mb-2">Analyze</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" >
+                                <div id="data_container">
+                                    <pre id="serialData">
+
+                                        <div id="no-output-alert" class="alert alert-primary" role="alert" >
+                                            No output yet
+                                        </div>
+
+                                        </pre>
+                                </div>
+                                <div style="margin-top:5px" class="form-group"> <input type="text" id="uart-input" class="form-control" placeholder="Send commands"> </div>
+                            </div>
+                        </div>
+
+
+                        <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Binwalk</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  Are you sure to delete this element <span id="node-name"></span>?
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                  <button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                          aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Transfer File</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <ul class="list-group">
+                                          <li id="usbTransferLi" class="list-group-item d-flex justify-content-between align-items-center">
+                                              Transfer file via USB
+                                              <span class="badge badge-warning">Device not detected</span>
+                                              <button type="button" class="btn btn-primary" id="btnTransferUSB">Transfer</button>
+                                          </li>
+                                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                                              Transfer file via HTTP (to do)
+                                              <button type="button" class="btn btn-primary" disabled>To Do</button>
+                                          </li>
+                                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                                              Transfer file via FTP (to do)
+                                              <button type="button" class="btn btn-primary" disabled>To Do</button>
+                                          </li>
+                                      </ul>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+
+
+                        <script>
+
+
+                            $(document).ready(function () {
+                                get_uart_logs()
+                                $("#data_container").scrollTop =   $("#data_container").scrollHeight;
+
+                                var socket = io.connect('http://' + document.domain + ':' + location.port);
+                            
+
+                                socket.on('serial_data', function (data) {
+                                    console.log(data)
+                                    $('#serialData').append(data + '<br>');
+                                    $("#no-output-alert").hide();
+                                    document.getElementById("data_container").scrollTop= document.getElementById("data_container").scrollHeight
+                                });
+
+                                $('#uartButton').click(function () {
+                                    var button = document.getElementById("uartButton");
+                                    button.innerText = "Connecting...";
+                                    button.className = "btn btn-outline-primary mb-2";
+                                    var baudrate = $('#baudrate').val();
+                                    socket.emit('start_serial', { baudrate: baudrate });
+                                });
+
+                                $("#uart-input").keypress(function(event) {
+                                    if (event.which === 13) {
+                                        var text = $("#uart-input").val();
+                                        $("#uart-input").val("");
+                                    console.log("sending "+text)
+                                    socket.emit('send_data_to_serial', { text: text });
+                                    }
+                                });
+                                            
+
+                                $('#saveBtn').click(function () {
+                                    var text = $('#serialData').html();
+
+                                    text = text.replace(/<br>/g, '\n');
+
+                                    $.ajax({
+                                        url: '/save_uart_logs',
+                                        type: 'POST',
+                                        data: { text: text },
+                                        success: function (response) {
+
+                                            snackbar('UART logs successfully saved:', response);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('An error occurred:', error);
+                                        }
+                                    });
+                                });
+
+                            function checkDeviceMounted() {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/is_device_mounted",
+                                    success: function(response) {
+                                        if (response.success && response.message) {
+                                            $('#btnTransferUSB').prop('disabled', false);
+                                            $('#usbTransferLi').find('.badge').removeClass('badge-warning').addClass('badge-success').text('Device detected');
+                                        } else {
+                                            $('#btnTransferUSB').prop('disabled', true);
+                                            $('#usbTransferLi').find('.badge').removeClass('badge-success').addClass('badge-warning').text('Device not detected');
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Error:', error);
+                                    }
+                                });
+                            }
+
+                            $('#btnTransferUSB').click(function () {
+                                var nodeName = $('#node-name').text();
+
+                                var requestData = {
+                                    nodeName: nodeName,
+                                    file_type: 'uart'
+                                };
+
+                                $.ajax({
+                                    url: '/transfer_usb',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(requestData),
+                                    success: function (response) {
+                                        
+                                        console.log('Transfer USB success:', response);
+                                        snackbar(response.message.success)
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error('Transfer USB error:', error);
+                                        snackbar(error)
+                                    }
+                                });
+                            });
+
+
+                                function get_uart_logs() {
+                                        $.getJSON(
+                                            '/get_uart_logs',
+                                            function(data) {
+                                                if (data.success) {
+                                                    var $list = $('<ul class="list-group"></ul>');
+
+                                                    data.result.forEach(function(item) {
+                                                        var $item = $('<li class="list-group-item d-flex justify-content-between align-items-center"></li>').text(item);
+                                                        
+                                                        var $buttonsDiv = $('<div class="d-flex"></div>');
+                                                        var $shareBtn = $('<button type="button" class="btn btn-outline-primary ml-2" title="share" data-toggle="tooltip"><i class="feather icon-share"></i></button>');
+                                                        $shareBtn.click(function () {
+                                                                var nodeName = item;
+                                                                $('#node-name').text(nodeName);
+                                                                
+                                                                checkDeviceMounted()
+                                                                
+                                                                $('#shareModal').modal('show');
+
+                                                            });
+                                                        var $deleteBtn = $('<button type="button" class="btn btn-outline-danger ml-2" title="delete" data-toggle="tooltip"><i class="feather icon-trash"></i></button>');
+                                                        $deleteBtn.click(function() {
+                                                            var nodeName = item;
+                                                            $('#node-name').text(nodeName);
+                                                            $('#confirmationModal').modal('show');
+                                                        });
+                                                        
+                                                        var $playBtn = $('<button type="button" class="btn btn-outline-primary" title="run" data-toggle="tooltip"><i class="feather icon-external-link"></i></button>');
+                                                        $playBtn.click(function() {
+                                                            var nodeName = item; 
+                                                            showUARTLogFile(nodeName);
+                                                        });
+                                                        $buttonsDiv.append($shareBtn)
+                                                        $buttonsDiv.append($playBtn);
+                                                        $buttonsDiv.append($deleteBtn);
+
+                                                        $item.append($buttonsDiv);
+
+                                                        $list.append($item);
+                                                    });
+
+                                                    $('#savedLogs').empty().append($list);
+                                                } else {
+                                                    snackbar("AJAX error");
+                                                }
+                                            }
+                                        );
+                                    }
+
+                                    $('#confirmBtn').on('click', function() {
+                                        spinner.spin(target)
+                                        var nodeName = $('#node-name').text();
+                                        
+                                        $.ajax({
+                                            url: '/delete_uart_log',
+                                            method: 'POST',
+                                            data: { name: nodeName },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    snackbar(response.message);
+                                                    $('#savedLogs li').each(function() {
+                                                        if ($(this).text() === nodeName) {
+                                                            $(this).remove();
+                                                            return false; 
+                                                        }
+                                                    });
+                                                } else {
+                                                    snackbar('Error: ' + response.error);
+                                                }
+                                                get_uart_logs()
+                                                spinner.stop()
+                                            },
+                                            error: function(xhr, status, error) {
+                                                snackbar('AJAX error: ' + error);
+                                                spinner.stop()
+
+                                            }
+                                        });
+
+                                        $('#confirmationModal').modal('hide');
+                                    });
+
+                                    function showUARTLogFile(fileName) {
+                                        $.ajax({
+                                            url: '/get_uart_log_file_content',
+                                            type: 'GET',
+                                            data: { file_name: fileName },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    var content = response.content;
+
+                                                    var $modal = $('<div class="modal fade" id="uartLogModal" tabindex="-1" role="dialog" aria-labelledby="uartLogModalLabel" aria-hidden="true">\
+                                                                        <div class="modal-dialog modal-lg" role="document">\
+                                                                            <div class="modal-content">\
+                                                                                <div class="modal-header">\
+                                                                                    <h5 class="modal-title" id="uartLogModalLabel">' + fileName + '</h5>\
+                                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+                                                                                        <span aria-hidden="true">&times;</span>\
+                                                                                    </button>\
+                                                                                </div>\
+                                                                                <div class="modal-body">\
+                                                                                    <pre>' + content + '</pre>\
+                                                                                </div>\
+                                                                            </div>\
+                                                                        </div>\
+                                                                    </div>');
+
+                                                    $('body').append($modal);
+
+                                                    $modal.modal('show');
+                                                } else {
+                                                    snackbar("Error: Unable to fetch log file content.");
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                snackbar("AJAX error: " + error);
+                                            }
+                                        });
+                                    }
+
+                                
+
+
+                                $('#analyzeButton').click(function () {
+                                    extractBootInfo($('#serialData').html())
+                                })
+
+                                function extractBootInfo(bootLog) {
+                                    const interestingInfo = {};
+
+                                    const ubootVersionMatch = bootLog.match(/U-Boot (\S+)/);
+                                    if (ubootVersionMatch) {
+                                        interestingInfo.ubootVersion = ubootVersionMatch[1];
+                                    }
+
+                                    const platformInfoMatch = bootLog.match(/Board:(\S+)/);
+                                    if (platformInfoMatch) {
+                                        interestingInfo.platform = platformInfoMatch[1];
+                                    }
+
+                                    const linuxKernelMatch = bootLog.match(/Linux version (\S+)/);
+                                    if (linuxKernelMatch) {
+                                        interestingInfo.linuxKernelVersion = linuxKernelMatch[1];
+                                    }
+
+                                    const firmwareVersionMatch = bootLog.match(/Firmware Version: (\S+)/);
+                                    if (firmwareVersionMatch) {
+                                        interestingInfo.firmwareVersion = firmwareVersionMatch[1];
+                                    }
+                                    snackbar(JSON.stringify(interestingInfo))
+                                    return interestingInfo;
+                                }
+                            });
+
+                            var opts = {
+                                lines: 15, // The number of lines to draw
+                                length: 23, // The length of each line
+                                width: 17, // The line thickness
+                                radius: 44, // The radius of the inner circle
+                                scale: 1, // Scales overall size of the spinner
+                                corners: 1, // Corner roundness (0..1)
+                                speed: 1, // Rounds per second
+                                rotate: 0, // The rotation offset
+                                animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+                                direction: 1, // 1: clockwise, -1: counterclockwise
+                                color: '#6b9eb8', // CSS color or array of colors
+                                fadeColor: 'transparent', // CSS color or array of colors
+                                top: '49%', // Top position relative to parent
+                                left: '50%', // Left position relative to parent
+                                shadow: '0 0 1px transparent', // Box-shadow for the lines
+                                zIndex: 2000000000, // The z-index (defaults to 2e9)
+                                className: 'spinner', // The CSS class to assign to the spinner
+                                position: 'absolute', // Element positioning
+                                };
+
+                                var target = document.getElementById('foo');
+                                var spinner = new Spin.Spinner(opts)
+
+                        </script>
+
+
+                        <!-- [ Main Content ] end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

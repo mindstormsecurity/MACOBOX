@@ -1,0 +1,213 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <!--[ daily sales section ] start-->
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card daily-sales">
+                                        <div class="card-block">
+                                            <h6 class="mb-4">Used Disk</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i
+                                                            class="feather icon-arrow-up text-c-green f-30 m-r-10"></i> {{ used_disk }} GB </h3>
+                                                </div>
+
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0">{{disk_percentage}}%</p>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 7px;">
+                                                <div class="progress-bar progress-c-theme" role="progressbar"
+                                                        style="width: {{ disk_percentage }}%;" aria-valuenow="{{ disk_percentage }}" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--[ daily sales section ] end-->
+                                <!--[ Monthly  sales section ] starts-->
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card Monthly-sales">
+                                        <div class="card-block">
+                                            <h6 class="mb-4">Used RAM</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
+                                                            class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>{{used_ram}} GB</h3>
+                                                </div>
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0">{{ram_percentage}}%</p>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 7px;">
+                                                <div class="progress-bar progress-c-theme2" role="progressbar"
+                                                        style="width: 35%;" aria-valuenow="35" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--[ Monthly  sales section ] end-->
+                                <!--[ year  sales section ] starts-->
+                                <div class="col-md-12 col-xl-4">
+                                    <div class="card yearly-sales">
+                                        <div class="card-block">
+                                            <h6 class="mb-4">CPU</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
+                                                            class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>{{cpu_temp}}°</h3>
+                                                </div>
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0"></p>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 7px;">
+                                                <div class="progress-bar progress-c-theme" role="progressbar"
+                                                        style="width: {{cpu_temp}}%;" aria-valuenow=" {{cpu_temp}}" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--[ year  sales section ] end-->
+                                <!--[ Recent Users ] start-->
+                                <div class="col-xl-8 col-md-6">
+                                    <div class="card Recent-Users">
+                                        <div class="card-header">
+                                            <h5>Recent Activities</h5>
+                                        </div>
+                                        <div class="card-block px-0 py-3">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                    <tr class="unread">
+                                                        <td>
+                                                            <i
+                                                            class="feather icon-cpu text-c-green f-30 m-r-10"></i>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="mb-1">SPI dump</h6>
+                                                            <p class="m-0">20240418-142620.bin</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="text-muted"><i
+                                                                    class="fas fa-circle text-c-green f-10 m-r-15"></i>11
+                                                                MAY 12:56</h6>
+                                                        </td>
+                                                        <td><a href="#!"
+                                                                class="label theme-bg2 text-white f-12">Show</a><a
+                                                                href="#!" class="label theme-bg text-white f-12">Run again</a>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="unread">
+                                                        <td>
+                                                            <i
+                                                            class="feather icon-share-2 text-c-green f-30 m-r-10"></i>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="mb-1">UART Bootlog saved</h6>
+                                                            <p class="m-0">log_20240417-120218.txt</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="text-muted"><i
+                                                                    class="fas fa-circle text-c-red f-10 m-r-15"></i>11 MAY
+                                                                10:35</h6>
+                                                        </td>
+                                                        <td><a href="#!"
+                                                                class="label theme-bg2 text-white f-12">Show</a><a
+                                                                href="#!" class="label theme-bg text-white f-12">Run again</a>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="unread">
+                                                        <td>                                                            <i
+                                                            class="feather icon-activity text-c-green f-30 m-r-10"></i>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="mb-1">I2C dump</h6>
+                                                            <p class="m-0">I2C dump saved ...</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="text-muted"><i
+                                                                    class="fas fa-circle text-c-green f-10 m-r-15"></i>9 MAY
+                                                                17:38</h6>
+                                                        </td>
+                                                        <td><a href="#!"
+                                                                class="label theme-bg2 text-white f-12">Show</a><a
+                                                                href="#!" class="label theme-bg text-white f-12">Run again</a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--[ Recent Users ] end-->
+
+                                <!-- [ statistics year chart ] start -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card card-event">
+                                        <div class="card-block">
+                                            <div class="row align-items-center justify-content-center">
+                                                <div class="col">
+                                                    <h5 class="m-0">Analyzed firmwares</h5>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <label class="label theme-bg2 text-white f-14 f-w-400 float-right">34%</label>
+                                                </div>
+                                            </div>
+                                            <h2 class="mt-3 f-w-300">45<sub class="text-muted f-14"></sub></h2>
+                                            <h6 class="text-muted mt-4 mb-0"> </h6>
+                                            <!--<i class="fab fa-angellist text-c-purple f-50"></i>-->
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-block border-bottom">
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-auto">
+                                                    <i class="feather icon-zap f-30 text-c-green"></i>
+                                                </div>
+                                                <div class="col">
+                                                    <h3 class="f-w-300">235</h3>
+                                                    <span class="d-block text-uppercase">TOTAL VULNERABILITIES</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->            
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
